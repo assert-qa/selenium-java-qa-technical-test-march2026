@@ -1,0 +1,37 @@
+[
+  {
+    "name": "UI Assertion Failures",
+    "matchedStatuses": ["failed"],
+    "messageRegex": ".*AssertionError.*",
+    "traceRegex": ".*assertThat.*"
+  },
+  {
+    "name": "Element Not Found / Timeout",
+    "matchedStatuses": ["broken"],
+    "messageRegex": ".*TimeoutException.*|.*NoSuchElementException.*"
+  },
+  {
+    "name": "Stale Element",
+    "matchedStatuses": ["broken"],
+    "messageRegex": ".*StaleElementReferenceException.*"
+  },
+  {
+    "name": "WebDriver / Browser Error",
+    "matchedStatuses": ["broken"],
+    "messageRegex": ".*(WebDriverException|SessionNotCreatedException|NoSuchSessionException).*"
+  },
+  {
+    "name": "Network / Page Load Error",
+    "matchedStatuses": ["broken"],
+    "messageRegex": ".*PageLoadStrategy.*|.*TimeoutException.*pageLoad.*"
+  },
+  {
+    "name": "Ignored Tests",
+    "matchedStatuses": ["skipped"]
+  },
+  {
+    "name": "Unknown Failures",
+    "matchedStatuses": ["broken"]
+  }
+]
+

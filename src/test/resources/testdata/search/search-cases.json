@@ -1,0 +1,33 @@
+[
+  {
+    "name": "broad keyword keeps product flow",
+    "keyword": "a",
+    "expectedUrlContains": "rt=product"
+  },
+  {
+    "name": "common product keyword works",
+    "keyword": "cream",
+    "expectedUrlContains": "rt=product"
+  },
+  {
+    "name": "skincare keyword opens product route",
+    "keyword": "skincare",
+    "expectedUrlContains": "rt=product"
+  },
+  {
+    "name": "makeup keyword opens product route",
+    "keyword": "makeup",
+    "expectedUrlContains": "rt=product"
+  },
+  {
+    "name": "fragrance keyword opens product route",
+    "keyword": "fragrance",
+    "expectedUrlContains": "rt=product"
+  },
+  {
+    "name": "letter s keyword opens product route",
+    "keyword": "s",
+    "expectedUrlContains": "rt=product"
+  }
+]
+
