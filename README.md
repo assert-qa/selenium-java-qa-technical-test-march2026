@@ -1,87 +1,254 @@
-# Technical Test Web Automation - Studi Kasus: Automation Test Store
+# Technical Test Web Automation — Studi Kasus: Automation Test Store
 
-Framework ini dibuat dengan Java + Selenium + JUnit 5 dengan arsitektur Page Object Model agar maintainable, scalable, dan reusable.
+Dibangun dengan **Java + Selenium + JUnit 5** menggunakan arsitektur **Page Object Model (POM)** agar maintainable, scalable, dan reusable.
 
-## Stack
-- Java 21
-- Maven
-- Selenium 4
-- JUnit 5
-- AssertJ
-- Allure Reporting
+---
 
-## Struktur
-- `src/main/java/com/automationteststore/base` : base class untuk page
-- `src/main/java/com/automationteststore/core` : config, driver, wait utilities
-- `src/main/java/com/automationteststore/components` : reusable UI components
-- `src/main/java/com/automationteststore/pages` : Page Objects
-- `src/test/java/com/automationteststore/base` : base setup test
-- `src/test/java/com/automationteststore/tests` : test suite
-- `src/test/java/com/automationteststore/suites` : JUnit Platform Suite runner (SmokeSuite, RegressionSuite)
-- `src/test/java/com/automationteststore/support` : test support (screenshot on failure)
-- `src/test/java/com/automationteststore/testdata` : JSON loader + data factory
-- `src/test/resources/testdata` : dataset JSON
+## Tech Stack
 
-## Menjalankan test
+| Komponen | Library / Tools | Versi |
+|---|---|---|
+| Bahasa | Java | 21 |
+| Build Tool | Maven | 3.x |
+| Browser Automation | Selenium WebDriver | 4.31.0 |
+| Test Runner | JUnit 5 (Jupiter) | 5.12.2 |
+| Assertions | AssertJ | 3.27.3 |
+| Reporting | Allure | 2.29.1 |
+| JSON Parsing | Jackson Databind | 2.18.3 |
+| Logging | SLF4J Simple | 2.0.17 |
+
+---
+
+## Prasyarat
+
+Pastikan tools berikut sudah terinstall dan tersedia di `PATH`:
+
+- **Java 21** → [https://adoptium.net](https://adoptium.net)
+- **Maven 3.8+** → [https://maven.apache.org/download.cgi](https://maven.apache.org/download.cgi)
+- **Google Chrome** (versi terbaru disarankan)
+- **Git** → [https://git-scm.com](https://git-scm.com)
+
+Verifikasi instalasi:
+```bash
+java -version
+mvn -version
+git --version
+```
+
+---
+
+## Clone Project
+
+```bash
+# 1. Clone repository
+git clone https://github.com/assert-qa/automationteststore-framework.git
+
+# 2. Masuk ke direktori project
+cd automationteststore-framework
+
+# 3. Install dependencies (tanpa menjalankan test)
+mvn clean install -DskipTests
+```
+
+---
+
+## Menjalankan Test
+
+### Jalankan semua test
 ```bash
 mvn clean test
 ```
 
-## Menjalankan test by tag
+### Jalankan hanya test **Smoke** (via tag)
 ```bash
 mvn clean test -Dgroups=smoke
+```
+
+### Jalankan hanya test **Regression** (via tag)
+```bash
 mvn clean test -Dgroups=regression
 ```
 
-## Menjalankan test via Suite file
-Suite file (`SmokeSuite`, `RegressionSuite`) adalah runner berbasis JUnit Platform Suite —
-setara dengan `testng.xml` — yang mengumpulkan dan menjalankan test berdasarkan tag secara terpusat.
-
+### Jalankan via **Suite file** (JUnit Platform Suite)
 ```bash
-# Jalankan Smoke Suite + generate report
+# Smoke Suite
 mvn clean test -Psmoke-suite
-mvn allure:report
 
-# Jalankan Regression Suite + generate report
+# Regression Suite
 mvn clean test -Pregression-suite
-mvn allure:report
 ```
 
-Lokasi suite file:
-- `src/test/java/com/automationteststore/suites/SmokeSuite.java`
-- `src/test/java/com/automationteststore/suites/RegressionSuite.java`
-
-## Matrix test saat ini
-- Smoke: 3 scenario
-- Regression: 7 scenario
-
-Komposisi saat ini:
-- `HomePageTest`: 2 smoke
-- `NavigationTest`: 1 smoke + 1 regression
-- `SearchTest` (JSON parameterized): 6 regression
-
-## Override runtime config
+### Jalankan dengan konfigurasi custom (browser, headless, timeout)
 ```bash
+# Ganti browser ke Firefox, matikan headless, timeout 20 detik
 mvn clean test -Dbrowser=firefox -Dheadless=false -Dtimeout.seconds=20
+
+# Headless Chrome (default)
+mvn clean test -Dbrowser=chrome -Dheadless=true
 ```
 
-## Generate Allure report
+### Jalankan test spesifik (satu class)
 ```bash
-mvn allure:report
+mvn clean test -Dtest=HomePageTest
+mvn clean test -Dtest=SearchTest
+mvn clean test -Dtest=NavigationTest
 ```
 
-Lalu buka report pada:
-- `target/site/allure-maven-plugin/index.html`
+---
 
-Label report yang dipakai:
-- `feature`: Home, Account Navigation, Search
-- `story`: objective tiap test method
-- `scenario` + `keyword` (khusus Search): ringkasan tiap data-driven case
+## Generate & Buka Allure Report
 
-## Catatan desain
-- `DriverManager` memakai `ThreadLocal` agar aman untuk parallel execution.
-- Tidak menggunakan implicit wait untuk mengurangi flaky test.
-- Screenshot otomatis di-attach ke Allure saat test gagal.
-- Locator dan aksi UI dipisahkan ke Page Object/Component.
-- Warning CDP Selenium untuk versi Chrome yang belum dipetakan disuppress di runtime test melalui `src/test/resources/logging.properties`.
+```bash
+# 1. Generate report HTML dari hasil test
+mvn allure:report
 
+# 2. Buka report (Windows)
+start target\site\allure-maven-plugin\index.html
+
+# Atau serve secara live di browser
+mvn allure:serve
+```
+
+Report tersedia di: `target/site/allure-maven-plugin/index.html`
+
+---
+
+## Matrix Test (Smoke vs Regression)
+
+| Test Class | Test Method | Tag |
+|---|---|---|
+| `HomePageTest` | `homepageTitleIsCorrect` | smoke |
+| `HomePageTest` | `homepageBannerIsVisible` | smoke |
+| `NavigationTest` | `loginPageIsAccessible` | smoke |
+| `NavigationTest` | `cartPageIsAccessible` | regression |
+| `SearchTest` | `searchWithKeyword[*]` (6 kasus data-driven) | regression |
+
+**Total: 3 smoke · 7 regression · 10 test case**
+
+---
+
+## Konfigurasi Runtime
+
+Default config ada di `src/main/resources/config.properties`:
+
+| Property | Default | Deskripsi |
+|---|---|---|
+| `baseUrl` | `https://automationteststore.com` | URL target aplikasi |
+| `browser` | `chrome` | Browser yang digunakan (`chrome` / `firefox`) |
+| `headless` | `true` | Mode headless browser |
+| `timeout.seconds` | `15` | Explicit wait timeout (detik) |
+
+Semua config dapat di-override melalui parameter `-D` saat menjalankan Maven.
+
+---
+
+## Struktur Project
+
+```
+automationteststore-framework/
+│
+├── pom.xml                                          # Konfigurasi Maven: dependencies, plugins, profiles
+├── README.md                                        # Dokumentasi project (file ini)
+│
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── com/automationteststore/
+│   │   │       │
+│   │   │       ├── base/
+│   │   │       │   └── BasePage.java               # Kelas induk semua Page Object; menyimpan driver & WaitHelper
+│   │   │       │
+│   │   │       ├── components/
+│   │   │       │   └── TopNavComponent.java         # Komponen navigasi atas (search bar, menu kategori)
+│   │   │       │
+│   │   │       ├── core/
+│   │   │       │   ├── config/
+│   │   │       │   │   └── ConfigManager.java       # Membaca config.properties + system properties (-D flags)
+│   │   │       │   ├── driver/
+│   │   │       │   │   ├── DriverFactory.java       # Membuat instance WebDriver (Chrome/Firefox + headless)
+│   │   │       │   │   └── DriverManager.java       # ThreadLocal driver holder; aman untuk parallel execution
+│   │   │       │   └── wait/
+│   │   │       │       └── WaitHelper.java          # Explicit wait utilities (clickable, visible, dll.)
+│   │   │       │
+│   │   │       └── pages/
+│   │   │           ├── HomePage.java                # Page Object: halaman utama (title, banner, navigasi)
+│   │   │           ├── LoginPage.java               # Page Object: halaman login
+│   │   │           └── SearchResultsPage.java       # Page Object: halaman hasil pencarian produk
+│   │   │
+│   │   └── resources/
+│   │       └── config.properties                    # Konfigurasi default (baseUrl, browser, headless, timeout)
+│   │
+│   └── test/
+│       ├── java/
+│       │   └── com/automationteststore/
+│       │       │
+│       │       ├── base/
+│       │       │   └── BaseTest.java                # Setup & teardown JUnit 5; membuka/menutup browser per test
+│       │       │
+│       │       ├── suites/
+│       │       │   ├── SmokeSuite.java              # JUnit Platform Suite runner untuk tag "smoke"
+│       │       │   └── RegressionSuite.java         # JUnit Platform Suite runner untuk tag "regression"
+│       │       │
+│       │       ├── support/
+│       │       │   ├── AllureAttachmentHelper.java  # Utility attach screenshot/log ke Allure report
+│       │       │   ├── AllureEnvironmentExtension.java # JUnit Extension: tulis environment.properties Allure
+│       │       │   └── FailureWatcher.java          # JUnit Extension: auto-screenshot saat test gagal
+│       │       │
+│       │       ├── testdata/
+│       │       │   ├── JsonTestDataLoader.java      # Membaca file JSON dari classpath menggunakan Jackson
+│       │       │   ├── SearchCase.java              # POJO model data untuk satu kasus pencarian
+│       │       │   └── SearchTestDataFactory.java   # Factory: memuat search-cases.json → List<Arguments>
+│       │       │
+│       │       └── tests/
+│       │           ├── HomePageTest.java            # [smoke] Verifikasi title & banner halaman utama
+│       │           ├── NavigationTest.java          # [smoke+regression] Verifikasi navigasi halaman
+│       │           └── SearchTest.java              # [regression] Data-driven search test via JSON
+│       │
+│       └── resources/
+│           ├── allure/
+│           │   └── categories.json                  # Definisi kategori custom Allure (Failed, Broken, dll.)
+│           ├── testdata/
+│           │   └── search/
+│           │       └── search-cases.json            # Dataset JSON untuk parameterized SearchTest
+│           ├── allure.properties                    # Konfigurasi Allure (allure.results.directory)
+│           ├── junit-platform.properties            # Konfigurasi JUnit Platform (parallel, dll.)
+│           └── logging.properties                   # Suppress CDP warning dari Selenium di console log
+│
+└── target/
+    ├── allure-results/                              # Raw JSON hasil test — input untuk allure:report
+    ├── site/
+    │   └── allure-maven-plugin/
+    │       └── index.html                           # Allure HTML report (buka setelah mvn allure:report)
+    └── surefire-reports/                            # Laporan XML/TXT dari Maven Surefire
+```
+
+---
+
+## Allure Report — Label & Kategorisasi
+
+Setiap test dilabeli dengan:
+
+| Label | Deskripsi |
+|---|---|
+| `@Epic` | Modul besar (contoh: "Store") |
+| `@Feature` | Fitur yang diuji (contoh: "Home", "Search", "Navigation") |
+| `@Story` | Objective test method yang spesifik |
+| `@Severity` | Tingkat keparahan (`BLOCKER`, `CRITICAL`, `NORMAL`, `MINOR`) |
+
+Kategori hasil di report:
+- ✅ **Passed** — test berhasil
+- ❌ **Product Defects** — assertion gagal (`AssertionError`)
+- 🔧 **Test Defects** — error teknis (NPE, timeout, dll.)
+- ⚠️ **Broken Tests** — exception lain yang tidak diantisipasi
+
+---
+
+## Tips & Troubleshooting
+
+| Masalah | Solusi |
+|---|---|
+| Warning CDP Chrome (Selenium vs Chrome version mismatch) | Warning ini aman dan sudah disuppress via `logging.properties`. Tidak mempengaruhi eksekusi test. |
+| Test timeout / flaky | Naikkan `timeout.seconds`: `mvn test -Dtimeout.seconds=25` |
+| Browser tidak ditemukan | Pastikan Chrome/Firefox terinstall. WebDriverManager otomatis mengunduh driver yang sesuai. |
+| Report tidak muncul | Jalankan `mvn allure:report` setelah test selesai, bukan sebelum. |
+| Port Allure serve sudah terpakai | Ganti port: `mvn allure:serve -Dallure.serve.port=8081` |
