@@ -10,12 +10,6 @@ import java.util.Properties;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
-/**
- * JUnit 5 extension that writes environment.properties to target/allure-results/
- * exactly once per test run, so the Allure report can display the environment panel.
- *
- * Register via @ExtendWith(AllureEnvironmentExtension.class) on BaseTest.
- */
 public class AllureEnvironmentExtension implements BeforeAllCallback, ExtensionContext.Store.CloseableResource {
 
     private static final String STORE_KEY = "allure-environment-written";
